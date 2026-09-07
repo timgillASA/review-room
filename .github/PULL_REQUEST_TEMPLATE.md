@@ -15,7 +15,7 @@ compensated" is a real reason; say so plainly.
 
 ## The change
 
-What you changed and where. If it touches `commands/bridge.md`: say which
+What you changed and where. If it touches `commands/room.md`: say which
 existing rule this replaces or generalizes (or that it is genuinely new), give
 the net line change to the command, and confirm the reasoning landed in
 `docs/protocol.md` rather than in the command. Include the smallest transcript

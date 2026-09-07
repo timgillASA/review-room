@@ -6,7 +6,7 @@ maintainer cannot see.
 
 ## What a change has to carry
 
-**Evidence, not reasoning.** Every rule in `commands/bridge.md` is there because
+**Evidence, not reasoning.** Every rule in `commands/room.md` is there because
 something failed, and `docs/protocol.md` records what. A pull request that
 changes behavior should say what happened on a real run: what you did, what the
 protocol did, and what it should have done instead. "This would be cleaner" is
@@ -19,7 +19,7 @@ a patch that guesses at a cause.
 ## Before you propose a rule
 
 This used to live in the command itself and was moved here: it governs people
-amending the protocol, not sessions running a bridge, and a session should not
+amending the protocol, not sessions running a room, and a session should not
 pay 33 lines of context for instructions about pull requests it will never
 write.
 
@@ -63,7 +63,7 @@ submission here; leaving it out is.
 
 ## House rules
 
-- **The command is the only copy of the protocol.** `commands/bridge.md` holds
+- **The command is the only copy of the protocol.** `commands/room.md` holds
   the rules; `docs/protocol.md` explains why they exist and never restates them.
   Three separate copies of this command have drifted apart already, twice inside
   a week. Do not add a fourth, in any form, including a quoted excerpt in a doc

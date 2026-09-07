@@ -1,16 +1,16 @@
 {
-  "name": "claude-bridge",
-  "version": "0.16.2",
-  "description": "Session-to-session bridge for Claude Code.",
-  "repository": "https://github.com/timgillASA/claude-bridge",
+  "name": "review-room",
+  "version": "0.17.0",
+  "description": "A review room for coding-agent sessions.",
+  "repository": "https://github.com/timgillASA/review-room",
   "owner": {
     "name": "Tim Gill"
   },
   "plugins": [
     {
-      "name": "claude-bridge",
+      "name": "review-room",
       "source": "./",
-      "description": "Turn-based conversation between two or more Claude Code sessions over one shared markdown file."
+      "description": "Turn-based review room for two to four Claude Code or Codex sessions over one shared markdown file. Formerly claude-bridge."
     }
   ]
 }

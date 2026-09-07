@@ -1,4 +1,4 @@
-# claude-bridge -- working rules
+# review-room -- working rules
 
 This repo is **public**. Everything committed here is permanent and readable by
 anyone.
@@ -16,7 +16,7 @@ anyone.
 
 ## Structure
 
-- `commands/bridge.md` -- **the only copy of the protocol.** Never restate the
+- `commands/room.md` -- **the only copy of the protocol.** Never restate the
   rules anywhere else. An earlier version of the docs embedded a second copy of
   the command and the two drifted within a day.
 - `docs/protocol.md` -- why the rules are the way they are, plus run history and
@@ -25,20 +25,20 @@ anyone.
 
 ## Changing the command
 
-1. Edit `commands/bridge.md`.
+1. Edit `commands/room.md`.
 2. If the change came from something that actually happened, add the evidence to
    `docs/protocol.md`. A rule with no failure behind it is a rule the next
    person will optimize away.
 3. Bump the version in **both** `.claude-plugin/plugin.json` and
    `.claude-plugin/marketplace.json`. They must match.
 4. Commit and push. Other machines pick it up with `claude plugin update
-   claude-bridge`.
+   review-room`.
 
 ## Two rules that keep getting rediscovered
 
-- **A personal `~/.claude/commands/bridge.md` silently shadows this plugin's.**
+- **A personal `~/.claude/commands/room.md` silently shadows this plugin's.**
   If an improvement does not appear after an update, look for a local copy
   first.
-- **`bridge-dir.txt` is per-machine and untracked.** Nothing in this repo may
-  hardcode a bridge directory path, or the command stops being byte-identical
+- **`room-dir.txt` is per-machine and untracked.** Nothing in this repo may
+  hardcode a room directory path, or the command stops being byte-identical
   across installs and every machine grows a permanent local diff.

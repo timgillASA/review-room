@@ -1,4 +1,8 @@
-# claude-bridge
+# review-room
+
+*Formerly `claude-bridge`, renamed 0.17.0: a Codex seat has joined a run, so
+"Claude" was wrong, and "bridge" named the transport rather than the thing.
+The old GitHub URL redirects; the old install string does not.*
 
 A file-based, turn-based channel that lets two or more Claude Code sessions
 talk to each other, so you stop copy-pasting between terminals.
@@ -34,7 +38,7 @@ and Agent Teams. **If those work for you, use them instead.** Check with
 `/list-agents`.
 
 When this project started, neither was available on the native Windows CLI,
-and the bridge's one killer property was that its wait blocks inside a single
+and the room's one killer property was that its wait blocks inside a single
 tool call, so a waiting session spends no model turns.
 
 **That founding premise is now false, and this README says so rather than
@@ -42,14 +46,14 @@ quietly outliving it.** Verified 2026-08-23 on the machine this was built on:
 `ListAgents` saw five independently started terminal sessions, a message to an
 idle session woke it, and the reply woke the sender with no polling and no
 watch loop. Native messaging now has the free-wait property, plus one the
-bridge never had -- it wakes an idle session, where the bridge only wakes a
+room never had -- it wakes an idle session, where the room only wakes a
 session already sitting in the watch.
 
 What the native path still does not have is the reason this repo is not
 archived yet:
 
 - **A shared transcript.** Messages are point-to-point and leave no common
-  record. The bridge's append-only file is what makes citations, close-outs,
+  record. The room's append-only file is what makes citations, close-outs,
   and audits possible -- and it is what lets the user watch the whole
   conversation live in one window and post into it.
 - **Broadcast.** Three or more seats over point-to-point means every entry is
@@ -59,13 +63,13 @@ archived yet:
 - **Crossing an account boundary.** Native messaging is scoped to *your*
   sessions under *one* operating-system user -- the docs state outright that on
   a shared machine another user's sessions cannot deliver. A shared filesystem
-  path has no such scope, which is why this bridge works between different
+  path has no such scope, which is why this room works between different
   Windows accounts (and, untested, could work between different people). This
   is a hard boundary of the native design, not a missing feature, so it is the
   niche most likely to outlive everything else here.
 - **Crossing an agent boundary.** Native messaging is between Claude Code
   sessions. The file is between whatever can read and append to it: a Codex
-  CLI seat joined a watch bridge from the command file alone, with no plugin
+  CLI seat joined a watch room from the command file alone, with no plugin
   and no messaging tool, and made zero protocol guesses. Watch is the
   transport for this, same as for accounts.
 
@@ -81,7 +85,7 @@ are-you-done polling that neither channel handled well.
 
 So instead of retiring, the transport was rebuilt around the native channel:
 **protocol 2.0** keeps the file as the record -- every rule about it survives
--- and replaces the polling watch loop, on bridges that declare `TRANSPORT:
+-- and replaces the polling watch loop, on rooms that declare `TRANSPORT:
 ping`, with a one-line pointer message to each other session after every
 append. Seats no longer sit blocked in a loop; they answer, go back to their
 own work, and are woken for the next round. The watch loop remains fully
@@ -100,27 +104,27 @@ visibility of a held ping.
 ## Install
 
 ```
-claude plugin marketplace add timgillASA/claude-bridge
-claude plugin install claude-bridge@claude-bridge
+claude plugin marketplace add timgillASA/review-room
+claude plugin install review-room@review-room
 ```
 
 The repo is public, so nothing needs authentication, on any machine or account.
 
 The `name@marketplace` form is not optional. The bare `claude plugin install
-claude-bridge` may work, but the bare form of the **update** command below fails
-with `Plugin "claude-bridge" not found`, which reads like a broken install
+review-room` may work, but the bare form of the **update** command below fails
+with `Plugin "review-room" not found`, which reads like a broken install
 rather than a mistyped command. Use the qualified name for both.
 
-**If you already have a personal `~/.claude/commands/bridge.md`, delete it.** A
+**If you already have a personal `~/.claude/commands/room.md`, delete it.** A
 personal command silently shadows the plugin's, and you will spend an afternoon
-wondering why your improvements do not show up. If the bare `/bridge` does not
-resolve after install, the namespaced form `/claude-bridge:bridge` always will.
+wondering why your improvements do not show up. If the bare `/room` does not
+resolve after install, the namespaced form `/review-room:room` always will.
 
 **Updating** -- both lines, in this order:
 
 ```
-claude plugin marketplace update claude-bridge
-claude plugin update claude-bridge@claude-bridge
+claude plugin marketplace update review-room
+claude plugin update review-room@review-room
 ```
 
 The first line is not optional either. Marketplace clones are not auto-fetched,
@@ -133,25 +137,25 @@ keeps the old command until you restart it.
 
 ## First run
 
-Nothing to configure. The first `/bridge` on a machine asks where bridge files
+Nothing to configure. The first `/room` on a machine asks where room files
 should live:
 
 ```
-No bridge directory configured on this machine. Fixed drives:
+No room directory configured on this machine. Fixed drives:
 
-  1. D:\ClaudeBridge   (696 GB free)
-  2. E:\ClaudeBridge   (884 GB free)
-  3. C:\ClaudeBridge   (193 GB free, system drive)
+  1. D:\ReviewRooms   (696 GB free)
+  2. E:\ReviewRooms   (884 GB free)
+  3. C:\ReviewRooms   (193 GB free, system drive)
 
 Which? (or type a path)
 ```
 
-Your answer is written to `~/.claude/bridge-dir.txt` and never asked again. That
+Your answer is written to `~/.claude/room-dir.txt` and never asked again. That
 one file is the only machine-specific state, which is what makes the command
 byte-identical on every install: no local edit to a tracked file, so nothing to
 merge when you pull an improvement made on another machine.
 
-Keep the directory **outside any git repo**. A bridge file committed by accident
+Keep the directory **outside any git repo**. A room file committed by accident
 is a conversation living in somebody's history forever.
 
 ## Using it
@@ -160,8 +164,8 @@ Open two or more Claude Code sessions that have been doing **different** work.
 In each:
 
 ```
-/bridge request-validation api-shape-review
-/bridge gateway-timeouts api-shape-review
+/room request-validation api-shape-review
+/room gateway-timeouts api-shape-review
 ```
 
 The first argument is what to call this session; the second is the topic (the
@@ -169,11 +173,11 @@ shared file). An earlier version of this README had them reversed against the
 command's own contract -- followed literally, the two sessions would each have
 created a different file named after themselves and never met. Caught by an
 outside review, not by use, which is its own small lesson about examples nobody
-executes. Or run `/bridge` bare and it lists the open bridges, shows who has
+executes. Or run `/room` bare and it lists the open rooms, shows who has
 joined and who has finished, and proposes a name for the session you are in:
 
 ```
-Open bridges in D:\ClaudeBridge:
+Open rooms in D:\ReviewRooms:
 
   1. api-shape-review   2 min ago    joined: request-validation, gateway-timeouts
   2. cache-eviction     3 days ago   joined: hot-path (DONE)   [closed]
@@ -186,13 +190,13 @@ you have been running in this session.
 clicking between terminals for a partial view of each:
 
 ```powershell
-Get-Content 'D:\ClaudeBridge\api-shape-review.md' -Wait -Tail 40
+Get-Content 'D:\ReviewRooms\api-shape-review.md' -Wait -Tail 40
 ```
 
 or, on Linux or macOS:
 
 ```sh
-tail -f -n 40 ~/ClaudeBridge/api-shape-review.md
+tail -f -n 40 ~/ReviewRooms/api-shape-review.md
 ```
 
 **You can talk in it too.** Append an entry under your own name and every
@@ -202,26 +206,26 @@ how you kill a rabbit hole from one window instead of three.
 **Ending:** any session can drop the marker, or you can:
 
 ```powershell
-New-Item 'D:\ClaudeBridge\api-shape-review.md.STOP' -ItemType File -Force
+New-Item 'D:\ReviewRooms\api-shape-review.md.STOP' -ItemType File -Force
 ```
 
 ```sh
-touch ~/ClaudeBridge/api-shape-review.md.STOP
+touch ~/ReviewRooms/api-shape-review.md.STOP
 ```
 
-On a watch bridge each session notices within about five seconds and stops
-looping. On a ping bridge nothing polls, so after dropping STOP by hand,
-tell any one session "check the bridge" -- it appends the closing entry and
+On a watch room each session notices within about five seconds and stops
+looping. On a ping room nothing polls, so after dropping STOP by hand,
+tell any one session "check the room" -- it appends the closing entry and
 its pings carry the close to the rest (the file header reminds you). The
-sessions themselves stay alive. Closed bridges are moved to `history\` a day
+sessions themselves stay alive. Closed rooms are moved to `history\` a day
 later by whichever session next runs discovery -- which means a machine where
-nobody runs `/bridge` archives nothing, so an old STOP sitting in the
+nobody runs `/room` archives nothing, so an old STOP sitting in the
 directory is normal, not a failure.
 
-## What a bridge looks like
+## What a room looks like
 
 ```markdown
-# Bridge: api-shape-review
+# Room: api-shape-review
 
 AGENDA: settle the error envelope for v2 before either of us writes more
 handlers. Open question: do we return 422 or 400 for schema violations?
@@ -263,16 +267,16 @@ exception.
 The mechanical test: **does my next question depend on your answer?** If every
 question can be written up front, that is a handoff no matter how fast the
 replies come. If question two does not exist until question one is answered,
-that is a bridge.
+that is a room.
 
 **Read the handoff queue before you open one.** The queue is the channel a
-bridge is the exception to, so if the answer is already sitting in it, the
-bridge is not the exception -- it is a re-run. In one run, reading the queue
+room is the exception to, so if the answer is already sitting in it, the
+room is not the exception -- it is a re-run. In one run, reading the queue
 properly for the first time in over a week turned up a breaking change awaiting
 comment, an entry retained for a session that had never absorbed it, and an
 answer to the very question that run's agenda listed as open. None of that was
-visible from inside the bridge, which was busy producing a stream of
-resolved-feeling items. A bridge does not report the work it duplicates.
+visible from inside the room, which was busy producing a stream of
+resolved-feeling items. A room does not report the work it duplicates.
 
 The value is not speed. It is that your mechanism claims get shot at by sessions
 holding different evidence before you build on them. That only works when the
@@ -331,7 +335,7 @@ that produced each.
   faith can issue a ruling no human made.
 - **STOP does not mean the file stopped changing.** Corrections land after every
   watcher has exited. Re-read to the end before you write anything durable that
-  draws on the bridge -- a doc, a commit, a memory entry, a report to your user.
+  draws on the room -- a doc, a commit, a memory entry, a report to your user.
 
 There is also a rule about writing rules -- "name the two situations your rule
 cannot tell apart" -- added after repeated amendments shipped the same defect in
@@ -355,7 +359,7 @@ Linux, over SMB. macOS has not run. A seat whose harness approves every write
 by hand (the Codex run needed five approvals in eleven entries) is slower per
 entry than the round cap's wall-clock assumptions expect, which were tuned on
 seats that append unattended. And reaching a shared path from a domain-joined
-Windows box took longer than the bridge itself: by hostname it would not
+Windows box took longer than the room itself: by hostname it would not
 authenticate to a NAS with a credential that worked from Linux, by IP address
 it did (suspected Kerberos-before-NTLM, unverified).
 
@@ -371,7 +375,7 @@ frequencies are not established, and the rules are tested at two and three
 seats, reasoned beyond that.** The protocol has never been exercised against a
 slow or absent counterpart, which is the condition it itself calls the most
 common one -- and its archival and close rules only execute when somebody runs
-the tool, so an abandoned bridge can sit formally open for days with nothing to
+the tool, so an abandoned room can sit formally open for days with nothing to
 notice. Both are known, documented, and unfixed.
 
 Treat the ranking of fixes as reasoning rather than measurement. If you run this

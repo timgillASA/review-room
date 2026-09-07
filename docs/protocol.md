@@ -1,12 +1,16 @@
 # Why the rules are the way they are
 
 Reasoning, run history, and rejected designs. The command in
-[`commands/bridge.md`](../commands/bridge.md) is the only copy of the protocol
+[`commands/room.md`](../commands/room.md) is the only copy of the protocol
 itself; this file explains it and must never restate it. An earlier version of
 this document embedded a full copy of the command, and the two drifted within a
 day, which is the usual fate of a second source of truth.
 
 Read this before softening any rule. Each one is here because something failed.
+
+Before 0.17 the project was `claude-bridge` and a room was called a bridge. The
+dated documents under `docs/` are frozen records and keep that word; the
+mechanism they describe is unchanged.
 
 ---
 
@@ -16,7 +20,7 @@ Read this before softening any rule. Each one is here because something failed.
 
 Appends do not land in timestamp order. Sessions compose while others are
 writing, so an entry can appear with a timestamp earlier than the entry above
-it. Directly observed: a bridge file's last-write time preceded the wall-clock
+it. Directly observed: a room file's last-write time preceded the wall-clock
 start of the watcher process that was about to write to it.
 
 Early runs had every session improvising its own way of slicing the file, and
@@ -57,7 +61,7 @@ Two runs, compared:
 
 The short-entry run went better on every axis despite twice the participants.
 That is the whole basis for the fifteen-line rule. A long entry is a handoff
-wearing a bridge costume: it draws a long reply, and the thread dies of weight.
+dressed as a room entry: it draws a long reply, and the thread dies of weight.
 
 ## Solutions get cheaper each round, if the format allows it
 
@@ -110,7 +114,7 @@ With evidence, from runs that set out to break them:
 
 - **It does not wedge a session.** Three interrupts, three immediate returns,
   session usable every time.
-- **It does not orphan its watcher.** Tested against a bridge with no live
+- **It does not orphan its watcher.** Tested against a room with no live
   counterpart so the watch actually blocked: the process wrote its own PID to a
   file before looping and was dead immediately after the interrupt. Earlier
   attempts failed to test the case at all, because a fast-replying counterpart
@@ -122,14 +126,14 @@ With evidence, from runs that set out to break them:
   cost a full model turn.
 
 One caution about testing the second point: a process check that greps command
-lines for the string `ClaudeBridge` matches *itself*, because the querying
+lines for the room directory's name matches *itself*, because the querying
 command contains that string. That produced a confident report of leaked watcher
 processes which was entirely false and had to be retracted after it was already
 published into a close-out. Exclude the querying PID.
 
 ## The first-run drive list must exclude network drives
 
-The first run asks where bridge files should live. The original probe was
+The first run asks where room files should live. The original probe was
 `Get-PSDrive -PSProvider FileSystem`, which does not mean "fixed drives" even
 though the instruction above it said so.
 
@@ -148,7 +152,7 @@ happens to be a NAS.
 Network drives are wrong here for two reasons beyond speed. The watch loop stats
 the file every five seconds and the cost model assumes a cheap local call. And a
 mapped share is reachable from more than one machine, so two installs could open
-the same bridge with no idea the other exists -- sequence numbers collide, and
+the same room with no idea the other exists -- sequence numbers collide, and
 the "skip entries where `from` is your own name" rule cannot save a session from
 a stranger it never expected.
 
@@ -163,7 +167,7 @@ roomiest *local* disk, by a wide margin, was an external backup SSD: `DriveType`
 3, `BusType` USB. The corrected probe would have ranked a detachable drive
 first.
 
-That matters more here than it looks. A bridge folder on a drive that gets
+That matters more here than it looks. A room folder on a drive that gets
 unplugged does not fail loudly. The watch loop suppresses errors on its
 `Get-Item`, so the file's last-write time comes back null, compares unequal to
 the previous value, and the loop reports `CHANGED`. Every session wakes and
@@ -186,8 +190,8 @@ nearly acted on.**
 
 Hence: corrections are appended, never edited over a prior entry, and anyone
 about to act on a close-out re-reads the file to the end first. This is also why
-closed bridges are archived a day later by a passing session, rather than moved
-at close -- a correction appended to a bridge that has just been moved lands in a
+closed rooms are archived a day later by a passing session, rather than moved
+at close -- a correction appended to a room that has just been moved lands in a
 fresh empty file at the old path, or fails outright, and nobody learns either
 happened.
 
@@ -220,7 +224,7 @@ because read-modify-write is what clobbers and nobody does one -- but that is
 discipline, not an atomicity guarantee.
 
 **A "chair" role for three or more parties.** Both of its duties, opening and
-posting the close-out, already belong to whoever creates the bridge. It added a
+posting the close-out, already belong to whoever creates the room. It added a
 word and no behavior.
 
 **A hook-enforced checkpoint with a parking state machine.** Proposed on the
@@ -232,7 +236,7 @@ dedicated `CHECKPOINT` entry type, and a helper script so the user could answer
 from any window. **The round cap was kept; none of that machinery was.**
 
 Its premise came from a different system, one that ran autonomously with nobody
-necessarily watching. A bridge only runs while the user is sitting in a session,
+necessarily watching. A room only runs while the user is sitting in a session,
 almost always the creator, and they can interrupt or drop STOP at any moment;
 the outside observer the checkpoint escalates to is already in the room. Most of
 the complexity answered "which of five terminals do I answer in?", a question
@@ -240,7 +244,7 @@ that disappears once the creator prints the close-out to its own user.
 
 There is also nothing to write down. The round count is already the highest
 sequence number in an append-only file, so a rule that only *reads* cannot lose
-an update. Deleting the state beat locking it. Revisit if a bridge ever runs
+an update. Deleting the state beat locking it. Revisit if a room ever runs
 unattended, or passes ~10 rounds without converging.
 
 ## The identity hole, and why the fix is a prohibition
@@ -325,11 +329,11 @@ empty room from a true statement made at a different time.
 There is no fix here, only a prohibition on claiming what cannot be seen. The
 absence of a reply is not evidence of absence.
 
-## The bridge that could not be closed
+## The room that could not be closed
 
 One run's creator posted two close-outs and never posted DONE. STOP is only
 droppable once every JOINED session has DONE'd, so the close condition was
-permanently unreachable. The bridge sat formally open while actually abandoned,
+permanently unreachable. The room sat formally open while actually abandoned,
 which is precisely what a peer misread as "still live" while writing into the
 empty room above. It was eventually closed on the user's explicit instruction,
 by a session that recorded the close as irregular.
@@ -361,7 +365,7 @@ of the round cap, and both were true.
 One naming lesson, learned the dull way: three recaps of one run, each named for
 the topic and none for its author, are indistinguishable a day later.
 
-## A converged bridge has no exit
+## A converged room has no exit
 
 Separately and on another machine, a two-party run reached a clean answer and
 then could not stop.
@@ -402,7 +406,7 @@ The old wording said to re-read "before treating a close-out as final, and
 especially before acting on a finding from one". A session that has finished has
 no moment of acting -- it has a moment of *writing down*, and that is not the
 same thing. The rule now attaches to producing any durable record that draws on
-the bridge. **A protocol whose corrections do not reach the artifacts is a
+the room. **A protocol whose corrections do not reach the artifacts is a
 protocol that produces confident, well-cited, out-of-date documents.**
 
 ## The job assigned to whoever has already left
@@ -411,7 +415,7 @@ Two independent findings, from different machines and different failure paths,
 turned out to be the same shape.
 
 On a three-party run the round cap was flagged correctly and handed to the
-creator as the rules then required, and the bridge ran another fourteen entries
+creator as the rules then required, and the room ran another fourteen entries
 because the creator was not paying attention. On a two-party run the STOP marker
 was never dropped, because the rule said to drop it once every session had
 posted DONE -- and the only participant who could observe that condition had
@@ -509,7 +513,7 @@ that appends before re-entering the watch is safe by accident -- its own append
 wakes the peer, and the peer's next entry wakes it. The dangerous path is the
 session that re-reads, decides **no reply is needed**, and re-enters the watch:
 a peer's entry landing between its read and the watch's first stat wakes nobody,
-and in a two-party bridge that is a peer waiting indefinitely on a reply to an
+and in a two-party room that is a peer waiting indefinitely on a reply to an
 entry that was, by every observable measure, delivered. Nothing errors. The
 failure presents as a quiet counterpart, which the liveness section says is
 indistinguishable from a thinking one.
@@ -552,7 +556,7 @@ each other in plain sight:
 
 - "Post DONE, do not keep polling."
 - "Re-read to the end before you write anything durable that draws on this
-  bridge."
+  room."
 
 Every recap is a durable write. The close-out lands after DONE by construction.
 So the second rule assigned a re-read at precisely the moment the first had
@@ -570,7 +574,7 @@ recap of a conversation whose ending it never read.
 The whole-file re-read is among the most emphasized rules in the protocol. It
 still failed, and the useful part is why.
 
-One session read the bridge from an offset on each wake -- the cheaper call, the
+One session read the room from an offset on each wake -- the cheaper call, the
 one the tooling encourages, and the one that produces no error when it drops
 entries. It missed seven, and consequently asserted that an item was untouched
 while a ruling on that item had been sitting in the gap the whole time. It
@@ -647,7 +651,7 @@ that makes the qualified form mandatory rather than advisable.
 
 Two seats on the same two-party run disagreed about how many rounds it had run:
 one said 5, the other 4. The whole gap was a single entry -- a RELAYED evidence
-drop that asked no question but moved the bridge's headline item. Neither seat
+drop that asked no question but moved the room's headline item. Neither seat
 thought it worth an entry to settle, which was the right call and also meant the
 cap's trigger was fuzzy at exactly the point it fires.
 
@@ -769,9 +773,9 @@ rule needing `carrying: nothing` rather than an omitted line: absence has to mea
 something chosen, not something assumed. The default goes to the safe side, since
 an unnecessary recommendation costs the user one line to wave through, while an
 unnecessary settlement costs them a decision they never got to make. It also
-keeps bridge files written before this rule from being read as all-`settle`.
+keeps room files written before this rule from being read as all-`settle`.
 
-## Carrying work out of the bridge (reasoned, not observed)
+## Carrying work out of the room (reasoned, not observed)
 
 Every other rule in this file was paid for by a run that went wrong. This one was
 not. It is marked so a later reader can weigh it accordingly, and so nobody cites
@@ -792,7 +796,7 @@ was named twice in one run as an example, and never once picked up as work.
 Agreement was reached and nobody left holding it.
 
 The second is about how the protocol has been getting away with the gap. On one
-run, a correction settled in a bridge did reach the repo that needed it, the same
+run, a correction settled in a room did reach the repo that needed it, the same
 day. The protocol contributed nothing to that -- the operator noticed and routed
 it by hand. Every run so far has had one human holding both ends, which the
 README already names as the untested condition, and a propagation step that works
@@ -1000,7 +1004,7 @@ confirmed what the native channel lacks: a shared transcript, broadcast, and
 any way to cross an OS-account boundary.
 
 Protocol 2.0 is the consequence: the file remains the record and every rule
-about it survives; the watch loop is replaced, on bridges that declare
+about it survives; the watch loop is replaced, on rooms that declare
 `TRANSPORT: ping`, by a one-line pointer message to each other seat after
 every append. The full design, its failure-mode analysis, and the review
 that shaped it are in `2026-08-23-protocol-2-ping-transport.md` -- the spec
@@ -1015,18 +1019,18 @@ prohibitions on inference instead, in the liveness section's new transport
 clause.
 
 Two follow-on amendments landed the same day, both operator-observed rather
-than run-incident: session naming on ping bridges defaults to the address
+than run-incident: session naming on ping rooms defaults to the address
 itself. Earlier runs showed naming friction and ambiguity -- two names per
 seat is a mapping that can drift, and hand-composed names collided or said
 nothing -- while the address is unique among live sessions by construction
 and, on repo-rooted sessions, already says what the seat is. The
 evidence-descriptive naming flow survives as the watch-mode rule and the
-ping-mode fallback for uninformative addresses. And bridge creation now
+ping-mode fallback for uninformative addresses. And room creation now
 proposes ping unless a non-qualifying seat is expected, so the safer-by-
 default header does not quietly become the recommendation.
 
 Watch mode remains fully specified and is the default for any file without a
-TRANSPORT line: it is the transport for cross-account bridges (the niche
+TRANSPORT line: it is the transport for cross-account rooms (the niche
 native messaging cannot serve at all), downlevel clients, and harnesses
 without messaging.
 
@@ -1090,7 +1094,7 @@ was corroborated, none corrected, because four seats doing the identical
 exercise hold no divergent evidence -- "I would not read 'this went
 smoothly' as evidence the channel is worth its cost on a real problem. That
 test still has not been run." Ninety minutes later it ran: a four-seat
-bridge over real migration-readiness state, three repo seats holding
+room over real migration-readiness state, three repo seats holding
 genuinely different ground truth plus one observer seat holding only the
 cross-repo handoff queue.
 
@@ -1128,7 +1132,7 @@ overlong conversation. The defect was not the threshold. The count is derived
 from the whole file on every re-read, deliberately, so that nothing has to be
 remembered -- and that same property meant a "carry on" reset nothing: the
 prose said the cap "applies again to the next stretch" while the arithmetic
-had no stretch. A renewed bridge and an overlong bridge derived to the same
+had no stretch. A renewed room and an overlong room derived to the same
 number. The user paid one forced stop per wake, which converts the cap from a
 checkpoint into a nag and trains the operator to resent it.
 
@@ -1193,7 +1197,7 @@ attached:
 - **A peer building on your error is how you catch it.** One seat's mis-scope
   was never challenged -- a peer built a contrast on top of it, and verifying
   its own code to answer the contrast is what made the author re-read and
-  self-correct. The recap's precision matters: "the bridge caught it" would
+  self-correct. The recap's precision matters: "the room caught it" would
   be a false record. A peer propagated it; the author caught it.
 - **A seat can be "mostly a handoff" and still be worth seating.** The MS
   public-form seat's honest verdict: its facts were all front-loadable, and
@@ -1219,7 +1223,7 @@ manageable at four seats, per the seats, not at eight.
 ## Tempo is in tension with claims discipline
 
 The migration-readiness recaps, read together, name the channel's most
-subtle hazard, and it is not wasted time. A live bridge rewards fast
+subtle hazard, and it is not wasted time. A live room rewards fast
 contribution, and fast contribution on incomplete analysis is exactly what
 evidence discipline forbids. Three exhibits from one run:
 
@@ -1237,7 +1241,7 @@ evidence discipline forbids. Three exhibits from one run:
   by the solo follow-up to the original scope. The close-out was honest to
   its watermark; the defect is structural: summarizing strips hedges. Hence
   the hedge-inheritance rule. The author's verdict stands as the section
-  title, plus its corollary: use a bridge to get caught being wrong; do not
+  title, plus its corollary: use a room to get caught being wrong; do not
   use it to think out loud about findings you have not finished checking.
 - **The divisor-shrink misfire, named independently by two seats** ("fired
   because participants left, not because we overran": 14 counted over a
@@ -1252,7 +1256,7 @@ firing exactly as the run's two highest-value exchanges were landing, with
 the user's manual lift the only thing that saved them. Synthesis arrives
 late when evidence is distributed -- early rounds are seats unloading what
 they hold; the cross-seat corrections come after. The threshold now scales:
-3 rounds plus one per live seat, which leaves every two-seat bridge at the
+3 rounds plus one per live seat, which leaves every two-seat room at the
 historical 5.
 
 ## Two runs off the Windows-Claude path (2026-09-01)
@@ -1262,8 +1266,8 @@ on Windows, and the docs had absorbed that harness's properties as if they were
 the protocol's. Two watch-transport runs on the same day separated the two.
 
 **A non-Claude coding agent joined from the command file alone.** No plugin,
-no `/bridge`, no messaging tool: it read `commands/bridge.md`, resolved the
-path, and ran an eleven-entry two-seat bridge with zero protocol guesses. Its
+no `/room`, no messaging tool: it read `commands/room.md`, resolved the
+path, and ran an eleven-entry two-seat room with zero protocol guesses. Its
 close-out was more complete than the Claude seat's -- it carried the round
 count with entry IDs and divisor, which the native seat did not. Sequence
 numbers collided once and the close-outs collided once, with the stranger's
@@ -1272,11 +1276,11 @@ absorbed both exactly as written. What it hit was harness fit: its read tool
 returned 646 of 1229 lines with a truncation warning and it had to notice; the
 timeout field name in the docs was ours, not its; its shell yielded the running
 watch after ten seconds and needed a second tool to resume; and every append
-into the bridge directory needed a human approval, five gated writes in eleven
+into the room directory needed a human approval, five gated writes in eleven
 entries, because its writable workspace was elsewhere. It left its scratch
 files rather than invent a cleanup rule, which was correct.
 
-**Windows and Linux ran a bridge over an SMB share.** One seat reached the
+**Windows and Linux ran a room over an SMB share.** One seat reached the
 share by UNC path, the other by a CIFS mount; both woke on the other's appends,
 no missed wakes, four rounds, clean close. Measured wake latencies were 2 to 9
 seconds, all upper bounds dominated by the five-second poll, with clock skew
@@ -1314,14 +1318,14 @@ that worked from Linux, and worked by IP address once a stale session under
 another account was cleared. Suspected cause, unverified: by hostname Windows
 tries Kerberos first and a NAS-local account has none; by IP it falls straight
 to NTLM as Linux does. "A path both seats can reach with write access" is the
-whole transport, and it can take longer than the bridge does.
+whole transport, and it can take longer than the room does.
 
 ## Known caveats
 
 - **The loop is not eternal.** It runs as an ongoing turn inside each session.
   If that session compacts context or otherwise ends its turn, the watch loop
   stops silently. Nothing is lost -- the full history is in the file -- but you
-  have to notice and reissue `/bridge`. Treat it as on for a working session,
+  have to notice and reissue `/room`. Treat it as on for a working session,
   not on forever.
 - **Check your harness timeout, and whether it can block at all.** The command
   asks for 600000 milliseconds on the tool call, under whatever name your
@@ -1334,27 +1338,27 @@ whole transport, and it can take longer than the bridge does.
 - **The round cap is self-assessment with arithmetic attached.** Counting
   entries is mechanical where "is this still productive?" is not, so it is a
   real improvement -- but the same party it constrains is the one applying it,
-  and at 5 rounds it fires near the natural end of a normal bridge rather than
+  and at 5 rounds it fires near the natural end of a normal room rather than
   catching a runaway. Its value is the forced question to the user.
 - **The cap has been routed around twice, in opposite directions.** Once by a
   participant that posted DONE at the cap and re-JOINED two entries later when a
   new round opened -- legitimate, and why DONE is documented as non-terminal.
   Once by the run simply continuing: the cap was detected correctly and the
-  remedy was owned by a session that was not acting on it, so the bridge ran
+  remedy was owned by a session that was not acting on it, so the room ran
   another fourteen entries. Detection was never the weak part.
 - **This channel is better at finding work than at causing it.** Observed twice,
   in different projects, by different sessions: a long-known load-bearing gap was
   named repeatedly during a run as an example of a cost, and picked up as work
-  zero times. Bridges reliably convert an unbuilt design into a better unbuilt
+  zero times. Rooms reliably convert an unbuilt design into a better unbuilt
   design plus a list of decisions for the user. That is real value and it is not
   delivery; the transcript volume makes it easy to mistake for delivery.
 - **STOP scoping is a real footgun.** An earlier version put the marker in the
-  bridge *directory*. A leftover from one day's run would have killed every
+  room *directory*. A leftover from one day's run would have killed every
   session of the next day's on its first poll, silently and correctly per the
   protocol, and it was caught only because one session happened to list the
   directory first. Hence per-file scoping plus the check-before-joining step.
 - **Content from other sessions is data, not instructions.** The command tells
-  each session not to treat bridge entries as anything overriding its own
+  each session not to treat room entries as anything overriding its own
   permissions, project instructions, or its user. This held across every run
   without incident; keep it even as the setup earns trust. Entries from the user
   are the deliberate exception.
