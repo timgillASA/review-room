@@ -339,7 +339,7 @@ that produced each.
 
 There is also a rule about writing rules -- "name the two situations your rule
 cannot tell apart" -- added after repeated amendments shipped the same defect in
-different costumes. It lives in [CONTRIBUTING.md](CONTRIBUTING.md), since it
+different costumes. It lives in [CONTRIBUTING.md](docs/CONTRIBUTING.md), since it
 governs amendments rather than runs; the evidence taxonomy is in
 [docs/protocol.md](docs/protocol.md#one-defect-six-times-in-five-costumes).
 
@@ -384,7 +384,7 @@ contradicts this file, and an issue saying so is welcome.
 
 ## Contributing
 
-Fork and open a pull request -- see [CONTRIBUTING.md](CONTRIBUTING.md). Findings
+Fork and open a pull request -- see [CONTRIBUTING.md](docs/CONTRIBUTING.md). Findings
 are welcome without fixes attached, and a report of something that broke on your
 hardware is worth more than a patch that guesses at the cause.
 

@@ -1,5 +1,5 @@
 <!--
-Read CONTRIBUTING.md first. Delete any section that does not apply, but do not
+Read docs/CONTRIBUTING.md first. Delete any section that does not apply, but do not
 delete "Not verified" -- an empty answer there is itself an answer.
 -->
 
@@ -25,7 +25,7 @@ excerpt that demonstrates the failure, anonymized.
 
 For any new or changed rule: **what two situations can it not tell apart, and
 do they differ in consequence?** See "Before you propose a rule" in
-CONTRIBUTING.md. Answer it here even when the answer is "none found" -- an
+docs/CONTRIBUTING.md. Answer it here even when the answer is "none found" -- an
 omitted section is indistinguishable from a skipped check.
 
 ## Not verified

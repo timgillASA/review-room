@@ -938,7 +938,7 @@ constraint in its DONE, by entry number, addressed to the seat it constrains.
 
 ## One defect, six times, in five costumes
 
-The rule under "Before you propose a rule" -- in `CONTRIBUTING.md`, since it
+The rule under "Before you propose a rule" -- in `docs/CONTRIBUTING.md`, since it
 governs amendments rather than runs -- is stated once and abstractly. This is
 the evidence, because the abstraction is not persuasive without it: every
 instance below looked correct to the person who wrote it, and every one was
