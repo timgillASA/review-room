@@ -1,6 +1,6 @@
 {
   "name": "review-room",
-  "version": "0.17.0",
+  "version": "0.18.0",
   "description": "A review room for coding-agent sessions.",
   "repository": "https://github.com/timgillASA/review-room",
   "owner": {

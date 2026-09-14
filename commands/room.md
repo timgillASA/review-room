@@ -88,38 +88,33 @@ else, and do not guess -- an unattended wrong guess joins the wrong file.
 
 ## Naming this session
 
-**On a ping room, the default session name IS your address** -- the name
-this session already answers to in `ListAgents`. One name instead of two:
-`from:` and `address:` cannot disagree, the name is guaranteed unique among
-live sessions (Claude Code renames collisions itself), and no one composes
-anything. Show it and proceed on confirmation like any proposal. Fall back to
-the derived-name flow below only when the address says nothing about the work
-(a generic name like `claude-2a` from a session started in a config
-directory) -- then the JOINED entry carries both, descriptive name in `from:`
-and the address in `address:`.
+**The name starts with the repo, on both transports.** `from:` is `<repo>`
+or `<repo>-<task>`, where `<repo>` is the basename of this session's working
+directory, lowercased (`serverconfig`, `azurework`; a session started in a
+config directory uses that directory's name, `claude-config`). The repo part
+is mandatory and anyone can check it against the working directory. Add the
+task part only when a second seat from the same repo is already in the file,
+or when the repo name says nothing about the evidence this seat holds.
 
-On a watch room there is no address, so the derived-name flow below is the
-whole rule. When the name is not given, propose one and let the user accept
-it by saying yes or just picking a room number. Do not make them compose
-it, and do not adopt it silently either -- show it, then proceed on
-confirmation.
+**The address is not the name.** On a ping room the address goes in the
+JOINED entry's `address:` field, looked up at join (step 3), and nowhere
+else. An earlier version made the address the name to save composing one.
+The address is assigned by the harness, which renames sessions on its own
+schedule and produces task names with no repo in them; on a four-seat run
+the user could not map seats to windows from the file, and the recap rule
+was already demanding the repo in every recap's first line to compensate.
+It belongs in the name.
 
-Derive the proposal from **what this session has actually been working on**,
-in this order of preference:
+When the name is not given, propose it and let the user accept by saying yes
+or just picking a room number. Do not make them compose it, and do not adopt
+it silently either -- show it, then proceed on confirmation.
 
-1. The task actually in play in this conversation -- the bug being chased, the
-   feature being built. You already know it; use it. `auth-timeout-repro`
-   beats anything mechanical.
-2. The current git branch, if it is descriptive (`fix-login-race` yes,
-   `main` or `dev` no).
-3. The repo or folder name -- **last resort, and say so when you use it.**
-   Flag that it describes where the session is rather than what it is doing,
-   and invite a better name.
-
-Never the terminal number, window position, or a bare `alpha`/`beta` unless
-the user chooses that themselves. A name that says which window you are in
-carries no signal about what evidence you hold, which is the only thing the name
-is for.
+For the task part, derive it from **what this session has actually been
+working on**: the bug being chased or the feature being built
+(`serverconfig-cf2025-patch`), or a descriptive git branch (`fix-login-race`
+yes, `main` no). Never the terminal number, window position, or a bare
+`alpha`/`beta` unless the user chooses that themselves. A name that says
+which window you are in carries no signal about what evidence you hold.
 
 **Check the proposal against the room file before offering it.** If a
 session with that name has already posted JOINED and has not posted DONE, it
@@ -353,8 +348,9 @@ your business (ping room). Step 3 applies only to ping rooms.
    address is this session's own name, the first line of `ListAgents`. Post
    that exact string, not your descriptive or self-assigned name -- a seat
    that posted its self-name instead cost the room a bookkeeping round when
-   pings to it bounced. Look it up now; do not recall it from earlier. It is
-   also your default session name (see "Naming this session").
+   pings to it bounced. Look it up now; do not recall it from earlier. It
+   goes in `address:` only; your name is the repo (see "Naming this
+   session").
 
 4. **Append a JOINED entry.** One line, no body -- with your address on a
    ping room, without it on a watch room:
@@ -447,6 +443,18 @@ Windows runs abandoned inline quoting for exactly this pattern, per-entry,
 after the inline form failed cold. The comma-form one-liner printed at join
 exists for the human user's short posts, not for seats.
 
+**The re-read and the append are separate tool calls, and the re-read's
+output is in front of you before the append runs.** A command that contains
+both the check and the write is wrong, whatever it prints: a leading grep
+bundled with the `Add-Content` executes before you can read it, and a
+trailing grep is a receipt, not a check. Same test as the read rule -- it is
+checkable in the shape of the command, not in the intent behind it. On a
+four-seat run all four seats bundled at least once and two did it on every
+append; it cost one seat two entries posted without having seen the peer
+entry that answered them, and the seats that got away with it did so only
+because a peer's entry usually had to be read between the two anyway. A
+safeguard that holds only while something else forces it is not a safeguard.
+
 **One question per entry.** This is the rule; length is a symptom of breaking
 it. Aim at fifteen lines and treat overrunning as a prompt to check whether you
 are asking two things at once, not as a violation in itself. At four or more
@@ -506,6 +514,13 @@ Including after STOP (that is precisely the correction case). The ping is one
   the range (`[west 12-14] appended`). Pinging after each append multiplies
   sends for nothing and walks into the native channel's per-recipient burst
   cap.
+- **The ping round is the next thing you do after the append, before any
+  other tool call.** An append whose ping never goes is the one failure the
+  whole-file read cannot heal, because no later ping triggers the catch-up.
+  It has happened: a seat appended, went straight to drafting its next
+  entry, and pinged only that one; two of three recipients never saw the
+  first, and it was addressed to one of them. The append succeeding is
+  exactly the moment attention moves on, so the rule is placed there.
 - **Never ping without an append behind it. Never acknowledge a ping.** An
   ack is a message with no entry behind it; two seats acking each other is
   the loop the native channel's throttles exist to kill.
@@ -592,6 +607,12 @@ line. The loop:
      both show up as unrecognized pairs.
      Do not rely on remembering to be thorough; rely on the cheap method being
      the complete one.
+     **Read each gap body from its header to the next header, never by a
+     line count.** A `head -N` on an entry of unknown length stops silently
+     and prints something that looks complete; a pair marked handled on a
+     partial read is worse than an unread one, because it looks handled in
+     your own notes. A seat did this to itself with a flag it typed, and
+     found it only by enumerating every pair at recap time.
    - **The rule is written as a prohibition on intent, and the failure is a
      property of tooling. Apply it to your command, not to your reasoning.**
      A session that had read this rule broke it anyway, by reaching for a
@@ -638,6 +659,34 @@ Two cases require you to reply to an entry addressed to someone else:
   Address the reply to `all`.
 - **You hold evidence that changes the answer.** Discretionary. One entry,
   flagged as unsolicited input rather than as an answer.
+
+## Evidence held by a session that is not in the room
+
+**A session that is not in the file cannot be cited, corrected, or held to
+the evidence standard, so its findings are not on the record.** You may
+write that evidence exists and which session holds it, and you invite that
+session; you may not carry its content in, labelled as relayed or not. This
+is the ping rule -- a pointer, never content -- applied to sessions. Labels
+do not help: on a four-seat run five findings entered by relay from a live
+session in a private thread, every one marked as relayed, and three of seven
+retractions traced to that shape, with two findings misattributed by three
+separate seats. A relayed claim reads as MORE established than a direct one,
+because it arrives pre-endorsed by a seat the room trusts while its author is
+unreachable. An agenda item that depends on an absent holder reports as
+blocked on that seat, not as settled.
+
+**Inviting a peer needs nobody's permission.** A seat that treated it as
+needing the user's say-so waited seventy-four minutes for a word that never
+came, relaying the whole time.
+
+**Record the invitation and its answer.** The inviter names it in its next
+entry (`invited <address>`); the invitee joins, or answers the inviter's
+message in one line, which the inviter appends marked RELAYED, quoting it.
+Without this, "invited and deferring" and "never invited" are the same
+silence. A seat that received an invitation mid-reboot of a production box
+deferred twelve minutes -- rightly, the room does not outrank its user --
+and the room spent an hour reasoning about its absence because nobody had
+written down that it had been asked.
 
 ## Ending
 

@@ -1,6 +1,6 @@
 {
   "name": "review-room",
-  "version": "0.17.0",
+  "version": "0.18.0",
   "description": "A review room for coding-agent sessions: one append-only markdown file where two to four Claude Code (or Codex) sessions holding different evidence correct each other's claims. No server, no daemon. Every rule was paid for by a run that failed.",
   "author": {
     "name": "Tim Gill"

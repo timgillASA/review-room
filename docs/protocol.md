@@ -1320,6 +1320,134 @@ tries Kerberos first and a NAS-local account has none; by IP it falls straight
 to NTLM as Linux does. "A path both seats can reach with write access" is the
 whole transport, and it can take longer than the room does.
 
+## The four-seat run of 2026-09-14: duties dropped the moment the action succeeds
+
+Four seats, ping mode, 61 entries including post-STOP corrections, about two
+hours, on a question whose practical answer had been in a runbook one seat
+owned for three weeks. The four recaps were read by two independent passes
+(`2026-09-14-recap-analysis-four-seat-run.md`: one fresh session, one Codex
+pass checking its own 2026-08-19 review against the run), and the operator
+chose between paired alternatives for three of the six amendments in 0.18.0.
+Three of the six are one defect in three costumes, which is why they are
+recorded together.
+
+**The bundled check.** All four seats, at least once, ran the re-read grep
+and the `Add-Content` in a single shell invocation; two seats did it on every
+append. A leading grep bundled with the write executes before the model can
+read it; a trailing grep is a receipt. Both print something reassuring. It
+cost one seat two entries posted without having seen the peer entry that
+answered them, and that seat diagnosed it twice as a reading habit -- "I need
+to be more careful" -- which the room then named as the failure under the
+failure: a fix that is an intention predicts recurrence, and the seat that
+paid was the one that could not fix it. The two seats that got away with it
+did so because a peer's entry usually had to be read between the grep and the
+append, and one seat tested that hypothesis against its own record before
+forming a view: five of five separate when a read was forced, zero of one when
+not. The rule is now a property of the command, like the read rule before it.
+
+**The unsent ping.** A seat appended an entry addressed to a peer, opened a
+scratch file for its next entry, and pinged only that next one. Two of three
+recipients never received a wake for the first. The recipient found it twenty
+minutes after closing the room, during the recap's whole-file re-read, and
+first recorded it as a possible transport failure; the sender settled it from
+its own record: nothing was sent. The ping-transport spec's F1 and F3 name
+this class exactly and call it the residual mechanical duty; this is the
+predicted failure occurring, not a new one. The rule now places the ping
+before any other tool call, because the append succeeding is the moment
+attention moves on.
+
+**The line-counted read.** A seat read an entry with `head -35` and stopped
+four lines short; an `awk` range for another entry overran into the first
+four lines of a third, which would have been marked handled on a partial
+read. No error either time. Found only by enumerating every `(session, N)`
+pair and diffing against what had been read to the end, which the recap rule
+forced. Read bodies to the next header, never by line count.
+
+Worth stating once for the three: the whole-file re-read rule was written
+against harness truncation and offset reads. This run broke it three ways
+that the wording did not reach, all at the point of action rather than at
+enumeration, and each was caught by a different seat than the one that broke
+it. The recap step, which the command says to drop once runs stop producing
+findings, produced four; it stays.
+
+**Relay.** A seat with the script at the centre of the agenda was not in the
+room for its first seventy-four minutes. Five of its findings entered through
+a second seat's private message thread, every one labelled as relayed, and
+the labelling changed nothing: three of seven retractions traced to that
+shape, two findings were misattributed by three separate seats, and the
+run's largest reversal entered as a relay. The relaying seat's own verdict:
+labelling is not the same as being answerable. The room proposed the soft
+rule (relay, then invite in the same turn); the operator chose the hard one.
+Ping mode already said a ping carries a pointer, never content, and that
+content arriving off the file is treated as not said. Nobody cited it; all
+four seats re-derived a weaker version, inside the room, on the afternoon
+the room's headline finding was three sessions re-deriving a runbook they
+owned. The rule now applies the existing principle to sessions: a
+non-participant's findings are not on the record, and an item that depends
+on one reports as blocked on that seat.
+
+**Invitation.** The word never appeared in the command; an invitation was an
+ad hoc message with no trace in the file and no required response. Two facts
+from this run, only one of them the invitee's. The relaying seat told the
+user the room existed, wrote "say the word if you want them in", and waited
+-- treating an invitation as needing authorization, which it never did. When
+the invitation finally went, the invitee received it mid-reboot of a
+production-bound server, deferred twelve minutes to confirm the box came
+back (the correct call; the room does not outrank a seat's user), and joined.
+Between those, three seats spent an hour narrowing why it was absent, killed
+one confident mechanism (a stale-name send, disproven by the one seat that
+had sent the invitation), and could not close the question until the invitee
+answered it. One recorded line -- `invited <address>` -- and a one-line
+answer would have made the deferral visible from the file.
+
+**Naming.** The 0.12 amendment that made the address the session name was
+operator-observed, not run-incident; this is the incident against it. In-file
+names held stable, but two of four were task names with no repo visible, one
+was a config-directory session, and the user could not map seats to windows
+from the file. The harness auto-namer behind the address renames on its own
+schedule: one seat renamed before the room, and a bystander session renamed
+mid-run while a seat was watching the listing. The recap rule was already
+forcing the repo into every recap's first line, which is the protocol
+admitting the repo is what the human needs. The name now starts with the
+repo, checkable against the working directory, and the address lives only in
+`address:`.
+
+**The round cap, first firing under 3+N.** It fired at 6.33 against 6 with
+three live seats, three of four recaps called it the natural end, and the
+user extended the room for an unrelated reason (to seat the absent holder).
+The stretch after the close-out ran 5.5 against 7 and closed on agreement.
+Under the flat 5, three of four merge-parity recaps had called the cap a
+guillotine; under 3+N its first firing was reported as a natural end. Across
+five rooms the cap has fired three times, once through the divisor defect
+since fixed; both legitimate firings were followed by a user extension that
+carried the best material. That is the design -- stop and ask -- and the
+threshold is unchanged. One recap said the cap "never fired here" while three
+said it did; they were describing different stretches, and none named its
+stretch.
+
+**What the analysis found that the seats did not.** The headline number,
+eight retractions, does not reconcile across the recaps: the close-out's list
+gives one seat four and another two, while their recaps say "three mine" and
+"three mine", and the first retraction on the list was caught by the user
+before the room opened. A room that learned "the IDs are the read" shipped a
+count whose IDs do not add up. Agenda item 1 failed the command's own opening
+test -- an item one seat could answer from the docs is not a room item -- and
+nobody applied it. And the "honest cost" section at the top of this file
+recurred exactly: one seat's assigned work sat untouched while three seats
+spent the last hour on the protocol.
+
+**Codex checking its own advice.** Asked which of its 2026-08-19
+recommendations were dropped and whether any dropped one caused a failure
+here, it found none had: every failure was in territory that review never
+covered. It then argued its deferred scanner should have been built sooner,
+while conceding in the same paragraph that the scanner as scoped would not
+have caught the unsent ping, the truncated read, or the bundled append. The
+seats already ran the header grep the scanner would replace, and bundled it.
+The failures were all after enumeration; a scanner would have been one more
+thing to bundle. Recorded because it is the second reviewer in this file to
+fit new evidence to its own prior proposal, and the analysis doc's handoff
+had warned about exactly that shape from the other direction.
+
 ## Known caveats
 
 - **The loop is not eternal.** It runs as an ongoing turn inside each session.
