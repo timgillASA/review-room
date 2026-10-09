@@ -1404,9 +1404,7 @@ answer would have made the deferral visible from the file.
 operator-observed, not run-incident; this is the incident against it. In-file
 names held stable, but two of four were task names with no repo visible, one
 was a config-directory session, and the user could not map seats to windows
-from the file. The harness auto-namer behind the address renames on its own
-schedule: one seat renamed before the room, and a bystander session renamed
-mid-run while a seat was watching the listing. The recap rule was already
+from the file. The harness auto-namer behind the address renamed one seat before the room and a bystander session mid-run while a seat was watching the listing; at the time this read as "renames on its own schedule", and the trigger was identified later (see "The rename has a trigger" below). The recap rule was already
 forcing the repo into every recap's first line, which is the protocol
 admitting the repo is what the human needs. The name now starts with the
 repo, checkable against the working directory, and the address lives only in
@@ -1447,6 +1445,16 @@ The failures were all after enumeration; a scanner would have been one more
 thing to bundle. Recorded because it is the second reviewer in this file to
 fit new evidence to its own prior proposal, and the analysis doc's handoff
 had warned about exactly that shape from the other direction.
+
+## The rename has a trigger (2026-09-17)
+
+The four-seat run recorded the harness renaming sessions "on its own schedule". It is not a schedule. A session's harness-derived name is replaced the instant its user approves a plan -- the harness changelog says as much ("sessions are now auto-named from plan content when you accept a plan"). Three renames, timed against the approval in each session's own transcript, landed in the same second as the approval. Earlier gap figures of half an hour to four hours had been measured from when someone noticed the new name, not from the approval, and were plans sitting unapproved.
+
+The exemption is a user-set name. A controlled pair in one repo, both launched the same way except that one carried `claude --name`, both approved a plan: the derived seat renamed at the instant of approval, the named seat did not move, and a second named seat held through ten minutes of post-approval work.
+
+Why it matters to a room: a room is where multi-seat decisions get made, so a ping room is most likely to be live at exactly the moment a member's address changes. The ADDRESS entry already handled the change, but only if the renamed seat noticed it, and nothing told it when to look. Two changes followed: seats bound for a ping room are launched with `--name`, and a seat without one re-checks its own address after every plan approval.
+
+Two adjacent findings went into the transport section in the same change. A `SendMessage` to a session id is rejected outright ("No agent named ... is reachable"), so the name is the only address there is -- which is the whole reason a stable one matters. And delivered is not read: by default the harness auto-delivers only between sessions in the same permission-mode class, holding a cross-class message for the receiving user's approval, where it can expire, while the sender's call still reports success. That one is documented harness behavior, not yet observed in a room.
 
 ## Known caveats
 

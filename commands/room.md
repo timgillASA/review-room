@@ -96,14 +96,9 @@ is mandatory and anyone can check it against the working directory. Add the
 task part only when a second seat from the same repo is already in the file,
 or when the repo name says nothing about the evidence this seat holds.
 
-**The address is not the name.** On a ping room the address goes in the
-JOINED entry's `address:` field, looked up at join (step 3), and nowhere
-else. An earlier version made the address the name to save composing one.
-The address is assigned by the harness, which renames sessions on its own
-schedule and produces task names with no repo in them; on a four-seat run
-the user could not map seats to windows from the file, and the recap rule
-was already demanding the repo in every recap's first line to compensate.
-It belongs in the name.
+**The address is not the name.** On a ping room the address goes in the JOINED entry's `address:` field, looked up at join (step 3), and nowhere else. An earlier version made the address the name to save composing one. The address is assigned by the harness, which produces task names with no repo in them; on a four-seat run the user could not map seats to windows from the file, and the recap rule was already demanding the repo in every recap's first line to compensate. It belongs in the name.
+
+**Seats that will join a ping room are launched with `claude --name <x>`.** A session's harness-derived name is replaced the instant its user approves a plan -- not on a timer, and not later -- and a room is where plans get approved, so a derived-name seat's address tends to move exactly when the room is busiest. A name set with `--name` is never replaced. When proposing a ping room, tell the user which seats should be relaunched with `--name` before joining; a seat already running under a derived name can still join, but owes an ADDRESS entry after every plan approval (step 4).
 
 When the name is not given, propose it and let the user accept by saying yes
 or just picking a room number. Do not make them compose it, and do not adopt
@@ -195,6 +190,7 @@ header next to the AGENDA:
   later (earlier listings do not show the session's own name, which joining
   needs). Waiting costs nothing and, unlike the watch, a ping wakes a seat
   that is idle or mid-other-work -- the room stops monopolizing sessions.
+  Seats should share one permission-mode class: by default the harness auto-delivers a message only between sessions in the same class, and a ping across a mismatch is held for the receiving user's approval and can expire there, while the send still reports success.
 - **Watch** is the transport for everything ping cannot reach: a seat under
   a different OS account (native messaging cannot cross that boundary at
   all), a downlevel Claude Code, a harness where `SendMessage` is absent or
@@ -371,8 +367,7 @@ your business (ping room). Step 3 applies only to ping rooms.
    closes the window to milliseconds; anything it reveals is processed as a
    normal wake.
 
-   **If your address later changes** (restart, rename), append an ADDRESS
-   entry and ping every addressed seat from the new address:
+   **If your address later changes** (restart, rename), append an ADDRESS entry and ping every addressed seat from the new address. A seat not launched with `--name` is renamed the moment its user approves a plan, so after any plan approval, re-read the first line of `ListAgents` before your next ping and compare it with your `address:`:
 
      ### [<N>] | from: <name> | ADDRESS | now: <new-listagents-name>
 
